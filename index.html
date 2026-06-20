@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>단계별 말하기 프로그램 | 초1 특수학급</title>
+  <style>
+    :root{
+      --bg:#fff8ec; --panel:#ffffff; --ink:#1f2937; --muted:#596273;
+      --line:#eadcc7; --accent:#ff8a3d; --accent2:#4f8cff; --green:#36b37e;
+      --red:#f45b69; --yellow:#ffd166; --purple:#8e7dff; --shadow:0 10px 30px rgba(77,54,27,.13);
+      --radius:26px; --btn:92px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;background:linear-gradient(180deg,#fff8ec 0%,#f7fbff 100%);color:var(--ink)}
+    button,input,select,textarea{font:inherit}
+    .app{min-height:100vh;display:flex;flex-direction:column}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,248,236,.96);backdrop-filter:blur(12px);border-bottom:2px solid var(--line)}
+    .top{max-width:1280px;margin:0 auto;padding:16px 20px;display:flex;gap:14px;align-items:center;justify-content:space-between}
+    h1{font-size:clamp(24px,4vw,42px);margin:0;line-height:1.1;letter-spacing:-.04em}
+    .subtitle{font-size:18px;color:var(--muted);margin-top:8px;line-height:1.35}
+    .badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:#fff;border:2px solid var(--line);padding:9px 14px;font-weight:800;color:#7a4d18;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+    .tabs{max-width:1280px;margin:0 auto;padding:0 20px 14px;display:flex;gap:10px;overflow:auto}
+    .tab{border:0;border-radius:18px;padding:16px 20px;min-height:62px;min-width:150px;font-size:20px;font-weight:900;background:#fff;color:#4a5568;box-shadow:0 3px 0 #eadcc7;cursor:pointer;white-space:nowrap}
+    .tab.active{background:#1f2937;color:#fff;box-shadow:0 3px 0 #111827}
+    main{width:100%;max-width:1280px;margin:0 auto;padding:22px 20px 44px;flex:1}
+    .screen{display:none}.screen.active{display:block}
+    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;margin-bottom:18px}
+    .card-panel{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+    .teacher-note{font-size:18px;line-height:1.55;color:#374151}
+    .teacher-note strong{color:#111827}.tiny{font-size:14px;color:var(--muted);line-height:1.5}.big{font-size:22px;line-height:1.5}
+    .stagebar{display:flex;gap:10px;overflow:auto;margin:10px 0 18px;padding-bottom:6px}
+    .stagebtn{border:3px solid transparent;background:#fff;border-radius:22px;padding:16px 18px;min-width:178px;text-align:left;cursor:pointer;box-shadow:0 5px 0 #ecd7bb}
+    .stagebtn b{display:block;font-size:21px;margin-bottom:4px}.stagebtn span{font-size:15px;color:var(--muted)}
+    .stagebtn.active{border-color:var(--accent);background:#fff0df;box-shadow:0 5px 0 #ffbd82}
+    .goal-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .goal{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px;min-height:105px}
+    .goal .num{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#ffefd7;color:#9a4a00;font-weight:900;margin-right:8px}.goal b{font-size:18px}.goal p{margin:8px 0 0;color:var(--muted);line-height:1.35}
+    .student-layout{display:grid;grid-template-columns:1fr 330px;gap:18px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .word-card{background:#fff;border:3px solid #fff;border-radius:32px;padding:18px;box-shadow:var(--shadow);min-height:286px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;cursor:pointer;transition:transform .12s ease,border .12s ease;position:relative;overflow:hidden}
+    .word-card:hover,.word-card:focus{outline:none;transform:translateY(-2px);border-color:var(--accent)}
+    .word-card.selected{border-color:var(--green);background:#effff7}
+    .word-card .ill{width:100%;height:145px;display:grid;place-items:center;background:linear-gradient(180deg,#fff8ee,#f6fbff);border:2px solid #f0e2cf;border-radius:24px;margin-bottom:10px}
+    .word{font-size:44px;font-weight:1000;letter-spacing:-.04em;line-height:1;color:#111827;text-align:center}.context{font-size:17px;color:var(--muted);text-align:center;line-height:1.35;margin-top:8px;min-height:46px}
+    .speak{width:100%;min-height:var(--btn);border:0;border-radius:26px;background:#1f2937;color:white;font-size:26px;font-weight:1000;cursor:pointer;box-shadow:0 6px 0 #111827;display:flex;align-items:center;justify-content:center;gap:8px}
+    .speak:active{transform:translateY(3px);box-shadow:0 3px 0 #111827}.speak.orange{background:var(--accent);box-shadow:0 6px 0 #d4621e}.speak.blue{background:var(--accent2);box-shadow:0 6px 0 #326bd1}.speak.green{background:var(--green);box-shadow:0 6px 0 #218b60}.speak.red{background:var(--red);box-shadow:0 6px 0 #c43e4a}
+    .side{display:flex;flex-direction:column;gap:14px}.routine{background:#fff;border:2px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+    .routine h3{font-size:24px;margin:0 0 10px}.routine ol{margin:0;padding-left:25px;font-size:19px;line-height:1.65}.routine li{padding:4px 0}.cue{border-radius:20px;background:#f7fbff;border:2px dashed #bcd6ff;padding:14px;margin-top:12px;font-size:18px;line-height:1.45}.cue b{color:#1d4ed8}
+    .record-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}.rec{border:0;border-radius:18px;min-height:74px;font-size:20px;font-weight:900;cursor:pointer;background:#f4f4f5}.rec.ok{background:#e9fff4;color:#137a52}.rec.prompt{background:#fff5d6;color:#8a5a00}.rec.pb{background:#ffe8eb;color:#bd2f3d}.rec.no{background:#eceff4;color:#4b5563}
+    .program{display:grid;grid-template-columns:1fr 1fr;gap:18px}.step-card{background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;position:relative;overflow:hidden}.step-card h3{font-size:28px;margin:0 0 10px}.step-card p,.step-card li{font-size:18px;line-height:1.55}.pill{display:inline-block;border-radius:999px;background:#fff0df;color:#9a4a00;font-weight:900;padding:7px 12px;margin:4px 4px 6px 0}.matrix{width:100%;border-collapse:separate;border-spacing:0 10px}.matrix th{font-size:16px;text-align:left;color:#6b7280;padding:4px 8px}.matrix td{background:#fff;border-top:2px solid var(--line);border-bottom:2px solid var(--line);padding:13px 12px;vertical-align:top;font-size:17px;line-height:1.45}.matrix td:first-child{border-left:2px solid var(--line);border-radius:16px 0 0 16px;font-weight:900}.matrix td:last-child{border-right:2px solid var(--line);border-radius:0 16px 16px 0}
+    .data-layout{display:grid;grid-template-columns:420px 1fr;gap:18px}.form-row{margin-bottom:14px}.form-row label{display:block;font-weight:900;font-size:18px;margin-bottom:7px}.form-row input,.form-row select,.form-row textarea{width:100%;border:2px solid var(--line);border-radius:16px;padding:13px 14px;font-size:18px;background:#fff}.form-row textarea{min-height:90px}.wide-btn{width:100%;border:0;border-radius:20px;background:#1f2937;color:#fff;min-height:72px;font-size:22px;font-weight:1000;cursor:pointer;margin-top:8px}.wide-btn.secondary{background:#fff;color:#1f2937;border:2px solid var(--line)}.wide-btn.danger{background:var(--red)}
+    .log-table-wrap{overflow:auto;border-radius:22px;border:2px solid var(--line);background:#fff;box-shadow:var(--shadow)}table.logs{width:100%;border-collapse:collapse;min-width:760px}table.logs th,table.logs td{border-bottom:1px solid #eee2d2;padding:12px 10px;text-align:left;font-size:15px}table.logs th{position:sticky;top:0;background:#fff8ec;color:#4b5563}.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.summary{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px;text-align:center}.summary b{display:block;font-size:32px;color:#111827}.summary span{color:var(--muted);font-weight:800}
+    .home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.home-item{background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px}.home-item h3{font-size:27px;margin:0 0 10px}.home-item li{font-size:18px;line-height:1.6;margin:6px 0}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:16px 22px;font-size:20px;font-weight:900;box-shadow:0 12px 28px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.2s;z-index:99}.toast.show{opacity:1;bottom:34px}.sr-only{position:absolute!important;clip:rect(1px,1px,1px,1px);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+    svg{max-width:100%;height:auto}.print-only{display:none}
+    @media (max-width:1050px){.hero,.student-layout,.program,.data-layout,.home-grid{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.goal-strip,.summary-cards{grid-template-columns:repeat(2,1fr)}.side{order:-1}}
+    @media (max-width:640px){.top{display:block}.grid{grid-template-columns:1fr}.goal-strip,.summary-cards{grid-template-columns:1fr}.word-card{min-height:260px}.word{font-size:42px}.tab{min-width:128px;font-size:18px}.stagebtn{min-width:155px}.card-panel{padding:16px}.speak{min-height:84px}.student-layout{gap:14px}}
+    @media print{header,.tabs,.speak,.record-buttons,.wide-btn,.toast{display:none!important}.screen{display:block!important;page-break-after:always}.word-card,.card-panel,.step-card,.home-item,.routine{box-shadow:none}.print-only{display:block}.student-layout,.program,.data-layout,.home-grid,.hero{grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(3,1fr)}body{background:#fff}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="top">
+      <div>
+        <h1>내 말 버튼</h1>
+        <div class="subtitle">초1 지적장애 학생을 위한 단계별 단어 말하기 프로그램</div>
+      </div>
+      <div class="badge">🔊 한국어 음성 · 큰 버튼 · 쉬운 말</div>
+    </div>
+    <nav class="tabs" aria-label="화면 선택">
+      <button class="tab active" data-tab="student">학생 활동</button>
+      <button class="tab" data-tab="program">지도 프로그램</button>
+      <button class="tab" data-tab="data">관찰 기록</button>
+      <button class="tab" data-tab="home">가정 연계</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="student" class="screen active" aria-labelledby="studentTitle">
+      <div class="hero">
+        <div class="card-panel">
+          <h2 id="studentTitle" style="font-size:32px;margin:0 0 8px">오늘의 목표: 행동 대신 말로 표현하기</h2>
+          <p class="teacher-note"><strong>지도 원리:</strong> 학생이 손으로 끌거나 가리키기 전에, 2~5초 기다리고 그림 버튼을 보여 준 뒤 <strong>단어 말하기</strong>를 모델링합니다. 말, 비슷한 발음, 음절 일부, AAC 버튼 선택도 처음에는 모두 의사소통 시도로 인정하고 즉시 강화합니다.</p>
+        </div>
+        <div class="card-panel">
+          <div class="big"><strong>사용 순서</strong><br>① 보여 주기 → ② 듣기 → ③ 따라 말하기 → ④ 바로 들어주기</div>
+          <button class="speak orange" style="margin-top:12px" onclick="speak('필요한 것을 말해요. 물. 쉬. 도와줘. 싫어.')">🔊 안내 듣기</button>
+        </div>
+      </div>
+
+      <div class="stagebar" id="stagebar"></div>
+      <div class="goal-strip" id="goalstrip"></div>
+
+      <div class="student-layout">
+        <div class="grid" id="wordgrid" aria-live="polite"></div>
+        <aside class="side">
+          <div class="routine">
+            <h3>교사 촉진 단계</h3>
+            <ol>
+              <li><b>기다리기</b> 2~5초</li>
+              <li><b>그림 가리키기</b></li>
+              <li><b>단어 첫소리</b> 말해주기</li>
+              <li><b>모델링</b> “물”</li>
+              <li><b>말하면 즉시 제공</b></li>
+            </ol>
+            <div class="cue"><b>문제행동이 보이면</b><br>낮은 목소리로 “말로 해요” → 가장 쉬운 단어 버튼 제시 → 말/버튼 반응 즉시 강화</div>
+          </div>
+          <div class="routine">
+            <h3>빠른 기록</h3>
+            <div id="lastWord" class="big" style="margin-bottom:10px">선택한 단어: 없음</div>
+            <div class="record-buttons">
+              <button class="rec ok" onclick="quickRecord('독립')">독립</button>
+              <button class="rec prompt" onclick="quickRecord('촉진')">촉진</button>
+              <button class="rec no" onclick="quickRecord('무반응')">무반응</button>
+              <button class="rec pb" onclick="quickRecord('문제행동')">문제행동</button>
+            </div>
+          </div>
+          <div class="routine">
+            <h3>오늘의 강화</h3>
+            <p class="teacher-note">말하면 바로 얻어요. <br><b>말 → 즉시 제공 → 칭찬</b></p>
+            <button class="speak green" onclick="speak('잘 말했어요! 멋져요!')">칭찬 듣기</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="program" class="screen" aria-labelledby="programTitle">
+      <div class="card-panel" style="margin-bottom:18px">
+        <h2 id="programTitle" style="font-size:34px;margin:0 0 12px">2022 교육과정 기반 단계별 말하기 프로그램</h2>
+        <p class="teacher-note">핵심 목표는 <strong>요구·거부·도움·감정</strong>을 기능적인 단어로 표현하여, 잡아끌기·가리키기·울기·소리지르기를 대체하는 것입니다. 학생의 현재 수준을 고려하여 공통 국어 성취기준은 개별화하고, 특수교육 기본 교육과정의 의사소통 참여 목표와 연결했습니다.</p>
+        <div>
+          <span class="pill">[2국01-02] 감정 나누기</span>
+          <span class="pill">[2국01-03] 듣고 말차례 지키기</span>
+          <span class="pill">[2국01-04] 경험·생각 말하기</span>
+          <span class="pill">[2국01-05] 듣기·말하기 흥미</span>
+          <span class="pill">[2국어01-03] 다양한 방법으로 의사소통 시도</span>
+          <span class="pill">[2국어01-04] 자발적 의사소통 참여</span>
+        </div>
+      </div>
+
+      <div class="program">
+        <article class="step-card">
+          <h3>1단계. 요구 단어 말하기</h3>
+          <p><b>목표:</b> 원하는 물건이나 행동을 단어로 말한다.</p>
+          <ul>
+            <li>목표어: 물, 과자, 쉬, 더, 주세요, 열어</li>
+            <li>기회: 물 마시기 전, 간식 전, 놀잇감 잠시 멈춤</li>
+            <li>절차: 기다리기 → 그림 제시 → “물” 모델링 → 반응 즉시 제공</li>
+            <li>숙달: 2일 연속 80% 이상 독립 또는 최소촉진</li>
+          </ul>
+        </article>
+        <article class="step-card">
+          <h3>2단계. 선택 단어 말하기</h3>
+          <p><b>목표:</b> 두 가지 중 원하는 것을 단어로 고른다.</p>
+          <ul>
+            <li>목표어: 공, 자동차, 블록, 책, 음악</li>
+            <li>기회: “공? 자동차?” 실제 물건 2개 제시</li>
+            <li>오류교정: 잘못 누르면 다시 보여 주고 정답 모델링</li>
+            <li>확장: 단어가 안정되면 “공 주세요”로 확장</li>
+          </ul>
+        </article>
+        <article class="step-card">
+          <h3>3단계. 거부·중단 단어 말하기</h3>
+          <p><b>목표:</b> 울거나 소리 지르기 전에 싫음과 중단을 말한다.</p>
+          <ul>
+            <li>목표어: 싫어, 그만, 아니, 쉬어요</li>
+            <li>기회: 덜 선호 과제, 전환, 기다리기 상황</li>
+            <li>중요: 거부 표현은 무시하지 말고 짧은 선택권 제공</li>
+            <li>예: “싫어” → “쉬어요? 도와줘?” 선택</li>
+          </ul>
+        </article>
+        <article class="step-card">
+          <h3>4단계. 도움·감정 단어 말하기</h3>
+          <p><b>목표:</b> 어려움과 감정을 단어로 알린다.</p>
+          <ul>
+            <li>목표어: 도와줘, 아파, 좋아, 무서워, 화나요</li>
+            <li>기회: 뚜껑 열기, 퍼즐 맞추기, 대기 상황</li>
+            <li>강화: 도움 요청 시 즉시 부분 도움 제공</li>
+            <li>일반화: 보건실, 급식실, 통합학급에서도 사용</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="card-panel" style="margin-top:18px">
+        <h3 style="font-size:30px;margin:0 0 8px">12주 운영안</h3>
+        <table class="matrix" aria-label="12주 운영안">
+          <thead><tr><th>기간</th><th>지도 초점</th><th>목표 단어</th><th>자료·촉진</th><th>평가</th></tr></thead>
+          <tbody>
+            <tr><td>1~2주</td><td>기초 반응·선호도 평가</td><td>물, 쉬, 더</td><td>실물+그림, 즉각 강화</td><td>반응 형태 기록</td></tr>
+            <tr><td>3~4주</td><td>요구 표현</td><td>주세요, 열어, 과자</td><td>시간지연, 첫소리 촉진</td><td>독립률 50% 목표</td></tr>
+            <tr><td>5~6주</td><td>선택 표현</td><td>공, 차, 블록, 책</td><td>2선택, 오류교정</td><td>선택 정확도</td></tr>
+            <tr><td>7~8주</td><td>거부·중단 표현</td><td>싫어, 그만, 아니</td><td>대체반응훈련, 기능적 의사소통</td><td>문제행동 전 표현 여부</td></tr>
+            <tr><td>9~10주</td><td>도움·감정 표현</td><td>도와줘, 아파, 좋아, 화나요</td><td>상황카드, 역할놀이</td><td>상황별 사용</td></tr>
+            <tr><td>11~12주</td><td>일반화·유지</td><td>개별 핵심어 8~12개</td><td>교실·급식·화장실·가정</td><td>촉진 감소, 유지율</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="data" class="screen" aria-labelledby="dataTitle">
+      <div class="card-panel" style="margin-bottom:18px">
+        <h2 id="dataTitle" style="font-size:34px;margin:0 0 8px">관찰 기록</h2>
+        <p class="teacher-note">기록은 이 기기 브라우저에만 저장됩니다. IEP 협의나 행동중재 점검 시 CSV로 내려받아 사용할 수 있습니다.</p>
+      </div>
+      <div class="summary-cards" id="summaryCards"></div>
+      <div class="data-layout">
+        <form class="card-panel" onsubmit="event.preventDefault(); addRecordFromForm();">
+          <div class="form-row"><label for="date">날짜</label><input id="date" type="date"></div>
+          <div class="form-row"><label for="situation">상황</label><select id="situation"><option>수업</option><option>간식</option><option>놀이</option><option>화장실</option><option>급식</option><option>전환</option><option>가정</option></select></div>
+          <div class="form-row"><label for="targetWord">목표 단어</label><select id="targetWord"></select></div>
+          <div class="form-row"><label for="prompt">반응 수준</label><select id="prompt"><option>독립</option><option>시각촉진</option><option>언어촉진</option><option>모델링</option><option>신체촉진</option><option>무반응</option><option>문제행동</option></select></div>
+          <div class="form-row"><label for="note">메모</label><textarea id="note" placeholder="예: 물병을 보고 손을 끌기 전에 ‘물’이라고 말함"></textarea></div>
+          <button class="wide-btn" type="submit">기록 추가</button>
+          <button class="wide-btn secondary" type="button" onclick="exportCSV()">CSV 내려받기</button>
+          <button class="wide-btn danger" type="button" onclick="clearRecords()">기록 전체 삭제</button>
+        </form>
+        <div>
+          <div class="log-table-wrap"><table class="logs"><thead><tr><th>시간</th><th>상황</th><th>단어</th><th>반응</th><th>메모</th></tr></thead><tbody id="logBody"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="home" class="screen" aria-labelledby="homeTitle">
+      <div class="card-panel" style="margin-bottom:18px">
+        <h2 id="homeTitle" style="font-size:34px;margin:0 0 8px">가정·통합학급 연계 안내</h2>
+        <p class="teacher-note">학교에서 배운 단어를 같은 그림, 같은 말, 같은 반응으로 반복해야 일반화가 빠릅니다. 보호자와 통합학급 교사에게 아래 문장을 그대로 공유해도 됩니다.</p>
+      </div>
+      <div class="home-grid">
+        <div class="home-item"><h3>가정에서</h3><ul><li>원하는 것을 바로 주기 전에 2초 기다립니다.</li><li>“말로 해요. 물.”처럼 짧게 모델링합니다.</li><li>비슷하게 말해도 바로 들어줍니다.</li><li>울 때는 길게 설명하지 말고 그림을 보여줍니다.</li></ul></div>
+        <div class="home-item"><h3>통합학급에서</h3><ul><li>책상 위에 핵심 단어 4개만 둡니다.</li><li>친구가 대신 말하지 않도록 잠깐 기다립니다.</li><li>말하면 “잘 말했어”라고 짧게 칭찬합니다.</li><li>과제 전환 전 “끝, 쉬어요, 도와줘”를 확인합니다.</li></ul></div>
+        <div class="home-item"><h3>문제행동 대응</h3><ul><li>울기·소리지르기는 의사표현 실패 신호로 봅니다.</li><li>안전 확보 후, 가장 쉬운 대체 단어를 제시합니다.</li><li>단어 표현이 나오면 즉시 기능을 충족합니다.</li><li>진정 후 같은 상황을 아주 짧게 다시 연습합니다.</li></ul></div>
+        <div class="home-item"><h3>주간 점검 질문</h3><ul><li>새로 독립한 단어는 무엇인가?</li><li>아직 촉진이 필요한 단어는 무엇인가?</li><li>문제행동 전에 말하기가 나왔는가?</li><li>어느 장소에서 일반화가 되었는가?</li></ul></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast">완료</div>
+<script>
+const stages=[
+ {id:'need',title:'1단계',sub:'필요한 것 말하기',goals:['원하는 것 말하기','말하면 바로 얻기','손끌기 전 말하기','단어 1개'],words:[
+  ['물','마시고 싶어요','cup'],['쉬','화장실에 가고 싶어요','toilet'],['더','더 하고 싶어요','more'],['주세요','갖고 싶어요','give'],['열어','열어 주세요','open'],['과자','먹고 싶어요','snack'] ]},
+ {id:'choice',title:'2단계',sub:'골라 말하기',goals:['2개 중 선택','좋아하는 것 고르기','정확히 가리키고 말하기','선택 후 제공'],words:[
+  ['공','공을 고를래요','ball'],['자동차','자동차를 고를래요','car'],['블록','블록 놀이해요','blocks'],['책','책을 볼래요','book'],['음악','노래를 들을래요','music'],['그림','그림을 볼래요','picture'] ]},
+ {id:'reject',title:'3단계',sub:'싫음·중단 말하기',goals:['울기 전 말하기','거부 인정하기','쉬는 방법 배우기','선택권 주기'],words:[
+  ['싫어','하고 싶지 않아요','no'],['그만','멈추고 싶어요','stop'],['아니','아니라고 말해요','no2'],['쉬어요','잠깐 쉬고 싶어요','rest'],['끝','이제 끝났어요','finish'],['다시','한 번 더 해요','again'] ]},
+ {id:'help',title:'4단계',sub:'도움·감정 말하기',goals:['어려움 알리기','감정 말하기','도움 요청하기','안전 알리기'],words:[
+  ['도와줘','혼자 하기 어려워요','help'],['아파','몸이 아파요','hurt'],['좋아','좋은 마음이에요','happy'],['화나요','화가 났어요','angry'],['무서워','무서운 마음이에요','scared'],['같이','같이 하고 싶어요','together'] ]},
+ {id:'general',title:'5단계',sub:'여러 곳에서 말하기',goals:['장소 바뀌어도 사용','사람 바뀌어도 사용','수업·급식·가정 연계','촉진 줄이기'],words:[
+  ['선생님','선생님을 불러요','teacher'],['친구','친구와 해요','friend'],['급식','밥 먹으러 가요','meal'],['화장실','화장실에 가요','toilet'],['놀이','놀고 싶어요','play'],['집','집에서도 말해요','home'] ]}
+];
+let currentStage=0, lastWord='';
+const allWords=[...new Set(stages.flatMap(s=>s.words.map(w=>w[0])))]
+function $(id){return document.getElementById(id)}
+function icon(type){
+ const common='viewBox="0 0 200 150" role="img" aria-hidden="true"';
+ const bg='<rect x="8" y="10" width="184" height="130" rx="28" fill="#fff7e8"/><circle cx="154" cy="34" r="15" fill="#ffd166"/>';
+ const person='<circle cx="76" cy="58" r="20" fill="#ffd0a8"/><path d="M47 125c5-34 53-34 58 0" fill="#4f8cff"/><path d="M61 55c5 7 24 7 31 0" stroke="#7a4d18" stroke-width="5" fill="none" stroke-linecap="round"/>';
+ const map={
+ cup:`${bg}<path d="M70 42h54l-8 78H78z" fill="#8fd3ff" stroke="#206b9e" stroke-width="5"/><path d="M121 58h18c16 0 16 28 0 28h-15" fill="none" stroke="#206b9e" stroke-width="6"/><path d="M78 72h38" stroke="#fff" stroke-width="6"/>`,
+ toilet:`${bg}<path d="M77 42h55v45c0 22-18 40-40 40h-4c-14 0-25-11-25-25V56c0-8 6-14 14-14z" fill="#e6f3ff" stroke="#436b8f" stroke-width="5"/><rect x="69" y="27" width="62" height="23" rx="8" fill="#bfe3ff" stroke="#436b8f" stroke-width="5"/><path d="M83 123h45" stroke="#436b8f" stroke-width="7" stroke-linecap="round"/>`,
+ more:`${bg}<circle cx="75" cy="75" r="18" fill="#4f8cff"/><circle cx="125" cy="75" r="18" fill="#4f8cff"/><path d="M100 45v60M70 75h60" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>`,
+ give:`${bg}${person}<path d="M104 88c23-12 35-12 52 0" stroke="#36b37e" stroke-width="12" stroke-linecap="round"/><rect x="132" y="50" width="36" height="32" rx="8" fill="#ffd166" stroke="#9a6a00" stroke-width="5"/>`,
+ open:`${bg}<rect x="68" y="30" width="70" height="100" rx="4" fill="#d7a86e" stroke="#7a4d18" stroke-width="6"/><path d="M90 32v96" stroke="#7a4d18" stroke-width="5"/><circle cx="122" cy="81" r="5" fill="#fff"/><path d="M141 54l26-18M145 75h31M141 98l26 18" stroke="#ff8a3d" stroke-width="8" stroke-linecap="round"/>`,
+ snack:`${bg}<rect x="63" y="42" width="74" height="74" rx="18" fill="#f6bf6b" stroke="#8a5a00" stroke-width="5"/><circle cx="82" cy="66" r="5" fill="#7a4d18"/><circle cx="112" cy="83" r="5" fill="#7a4d18"/><circle cx="97" cy="103" r="5" fill="#7a4d18"/>`,
+ ball:`${bg}<circle cx="100" cy="78" r="45" fill="#ff8a3d" stroke="#a44a13" stroke-width="6"/><path d="M58 78h84M100 35c-20 20-20 65 0 87M100 35c20 20 20 65 0 87" stroke="#fff" stroke-width="6" fill="none"/>`,
+ car:`${bg}<path d="M45 88h110l-13-32H75L58 88z" fill="#4f8cff" stroke="#1d4ed8" stroke-width="5"/><rect x="38" y="82" width="126" height="34" rx="14" fill="#4f8cff" stroke="#1d4ed8" stroke-width="5"/><circle cx="70" cy="119" r="12" fill="#1f2937"/><circle cx="134" cy="119" r="12" fill="#1f2937"/>`,
+ blocks:`${bg}<rect x="50" y="83" width="42" height="42" rx="7" fill="#ff8a3d" stroke="#9a4a00" stroke-width="5"/><rect x="97" y="83" width="42" height="42" rx="7" fill="#4f8cff" stroke="#1d4ed8" stroke-width="5"/><rect x="74" y="39" width="42" height="42" rx="7" fill="#36b37e" stroke="#16754d" stroke-width="5"/>`,
+ book:`${bg}<path d="M46 43h51c12 0 20 9 20 21v62H66c-11 0-20-9-20-20z" fill="#fff" stroke="#4f8cff" stroke-width="5"/><path d="M117 64c0-12 8-21 20-21h17v83h-37z" fill="#e9f2ff" stroke="#4f8cff" stroke-width="5"/><path d="M63 65h34M63 84h34" stroke="#ffd166" stroke-width="6" stroke-linecap="round"/>`,
+ music:`${bg}<path d="M78 102V44l54-12v58" stroke="#8e7dff" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="70" cy="105" r="17" fill="#8e7dff"/><circle cx="124" cy="92" r="17" fill="#8e7dff"/>`,
+ picture:`${bg}<rect x="48" y="35" width="104" height="80" rx="10" fill="#fff" stroke="#7a4d18" stroke-width="6"/><circle cx="78" cy="62" r="12" fill="#ffd166"/><path d="M55 108l35-32 22 20 16-14 20 26z" fill="#36b37e"/>`,
+ no:`${bg}${person}<path d="M123 43l40 70M163 43l-40 70" stroke="#f45b69" stroke-width="12" stroke-linecap="round"/>`,
+ stop:`${bg}<path d="M100 28l48 20 20 48-20 48H52L32 96l20-48z" fill="#f45b69" stroke="#9f1f2d" stroke-width="6"/><text x="100" y="105" text-anchor="middle" font-size="34" font-weight="900" fill="#fff">STOP</text>`,
+ no2:`${bg}<circle cx="100" cy="78" r="50" fill="#fff" stroke="#f45b69" stroke-width="10"/><path d="M66 112L134 44" stroke="#f45b69" stroke-width="11" stroke-linecap="round"/>`,
+ rest:`${bg}<path d="M52 95h96v28H52z" fill="#bfe3ff" stroke="#436b8f" stroke-width="5"/><path d="M58 73h38c16 0 24 8 28 22H58z" fill="#fff" stroke="#436b8f" stroke-width="5"/><circle cx="73" cy="61" r="15" fill="#ffd0a8"/>`,
+ finish:`${bg}<path d="M58 80l28 30 58-68" stroke="#36b37e" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+ again:`${bg}<path d="M61 80a39 39 0 0168-26" stroke="#4f8cff" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M132 42v31h-31" fill="none" stroke="#4f8cff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><path d="M139 83a39 39 0 01-68 26" stroke="#ff8a3d" stroke-width="11" fill="none" stroke-linecap="round"/>`,
+ help:`${bg}${person}<path d="M116 96c17-22 35-22 52 0" stroke="#36b37e" stroke-width="12" stroke-linecap="round"/><path d="M151 38v36M133 56h36" stroke="#36b37e" stroke-width="11" stroke-linecap="round"/>`,
+ hurt:`${bg}<path d="M100 122C55 88 50 55 75 42c15-8 25 0 25 0s10-8 25 0c25 13 20 46-25 80z" fill="#f45b69" stroke="#9f1f2d" stroke-width="5"/><path d="M100 56v26M100 99v2" stroke="#fff" stroke-width="10" stroke-linecap="round"/>`,
+ happy:`${bg}<circle cx="100" cy="76" r="48" fill="#ffd166" stroke="#9a6a00" stroke-width="5"/><circle cx="82" cy="66" r="6" fill="#1f2937"/><circle cx="118" cy="66" r="6" fill="#1f2937"/><path d="M76 88c12 18 36 18 48 0" stroke="#1f2937" stroke-width="7" fill="none" stroke-linecap="round"/>`,
+ angry:`${bg}<circle cx="100" cy="76" r="48" fill="#ff9e80" stroke="#9f1f2d" stroke-width="5"/><path d="M72 60l22 8M128 60l-22 8" stroke="#1f2937" stroke-width="7" stroke-linecap="round"/><circle cx="85" cy="79" r="5" fill="#1f2937"/><circle cx="115" cy="79" r="5" fill="#1f2937"/><path d="M80 103c13-10 27-10 40 0" stroke="#1f2937" stroke-width="7" fill="none" stroke-linecap="round"/>`,
+ scared:`${bg}<circle cx="100" cy="76" r="48" fill="#c6d4ff" stroke="#4f8cff" stroke-width="5"/><circle cx="83" cy="70" r="8" fill="#1f2937"/><circle cx="117" cy="70" r="8" fill="#1f2937"/><ellipse cx="100" cy="101" rx="12" ry="15" fill="#1f2937"/>`,
+ together:`${bg}<circle cx="78" cy="58" r="18" fill="#ffd0a8"/><circle cx="122" cy="58" r="18" fill="#ffd0a8"/><path d="M50 125c4-30 52-30 56 0" fill="#4f8cff"/><path d="M94 125c4-30 52-30 56 0" fill="#36b37e"/><path d="M78 91c12 12 32 12 44 0" stroke="#ff8a3d" stroke-width="9" stroke-linecap="round"/>`,
+ teacher:`${bg}<rect x="132" y="38" width="42" height="70" rx="6" fill="#fff" stroke="#7a4d18" stroke-width="5"/>${person}<path d="M130 58h34M130 76h25" stroke="#36b37e" stroke-width="6" stroke-linecap="round"/>`,
+ friend:`${bg}<circle cx="78" cy="58" r="18" fill="#ffd0a8"/><circle cx="122" cy="58" r="18" fill="#ffd0a8"/><path d="M48 125c4-30 54-30 60 0" fill="#ffd166"/><path d="M92 125c4-30 54-30 60 0" fill="#8e7dff"/>`,
+ meal:`${bg}<circle cx="100" cy="78" r="43" fill="#fff" stroke="#436b8f" stroke-width="5"/><circle cx="100" cy="78" r="25" fill="#f7f0da"/><path d="M51 42v72M64 42v72M57 42v28" stroke="#8a5a00" stroke-width="5" stroke-linecap="round"/><path d="M148 42v72" stroke="#8a5a00" stroke-width="8" stroke-linecap="round"/>`,
+ play:`${bg}<path d="M68 116l23-76 23 76" stroke="#4f8cff" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M86 78h56" stroke="#ff8a3d" stroke-width="9" stroke-linecap="round"/><circle cx="145" cy="78" r="18" fill="#ffd166" stroke="#9a6a00" stroke-width="5"/>`,
+ home:`${bg}<path d="M47 75l53-43 53 43" fill="#ffd166" stroke="#7a4d18" stroke-width="6" stroke-linejoin="round"/><rect x="61" y="74" width="78" height="50" fill="#fff" stroke="#7a4d18" stroke-width="6"/><rect x="91" y="92" width="20" height="32" fill="#ff8a3d"/>`
+ };
+ return `<svg ${common}>${map[type]||map.picture}</svg>`;
+}
+function renderStages(){
+ $('stagebar').innerHTML=stages.map((s,i)=>`<button class="stagebtn ${i===currentStage?'active':''}" onclick="setStage(${i})"><b>${s.title}</b><span>${s.sub}</span></button>`).join('');
+ renderGoals(); renderWords();
+}
+function renderGoals(){const s=stages[currentStage];$('goalstrip').innerHTML=s.goals.map((g,i)=>`<div class="goal"><span class="num">${i+1}</span><b>${g}</b><p>${i===0?'오늘 활동에서 반복해서 확인합니다.':i===1?'반응 즉시 기능을 충족합니다.':i===2?'촉진을 조금씩 줄입니다.':'가정과 통합학급으로 넓힙니다.'}</p></div>`).join('')}
+function renderWords(){const s=stages[currentStage];$('wordgrid').innerHTML=s.words.map(w=>`<article tabindex="0" class="word-card" onclick="selectWord('${w[0]}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectWord('${w[0]}')}"><div class="ill">${icon(w[2])}</div><div><div class="word">${w[0]}</div><div class="context">${w[1]}</div></div><button class="speak blue" onclick="event.stopPropagation();selectWord('${w[0]}')">🔊 말 듣기</button></article>`).join('')}
+function setStage(i){currentStage=i;renderStages();speak(stages[i].sub)}
+function getKoVoice(){const voices=speechSynthesis.getVoices();return voices.find(v=>v.lang==='ko-KR')||voices.find(v=>v.lang&&v.lang.startsWith('ko'))||null}
+function speak(text){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';u.rate=.82;u.pitch=1.05;const v=getKoVoice();if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){toast('이 브라우저에서 음성 재생을 지원하지 않습니다.')}}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
+function selectWord(word){lastWord=word;$('lastWord').textContent='선택한 단어: '+word;speak(word);document.querySelectorAll('.word-card').forEach(c=>c.classList.remove('selected'));[...document.querySelectorAll('.word-card')].find(c=>c.querySelector('.word').textContent===word)?.classList.add('selected');toast('“'+word+'” 말해요')}
+function today(){const d=new Date();return d.toISOString().slice(0,10)}
+function nowString(){const d=new Date();return d.toLocaleString('ko-KR',{dateStyle:'short',timeStyle:'short'})}
+function records(){return JSON.parse(localStorage.getItem('speakProgramRecords')||'[]')}
+function saveRecords(arr){localStorage.setItem('speakProgramRecords',JSON.stringify(arr));renderLogs()}
+function quickRecord(level){if(!lastWord){toast('먼저 단어를 선택하세요');return}const arr=records();arr.unshift({time:nowString(),date:today(),situation:'학생 활동',word:lastWord,prompt:level,note:'빠른 기록'});saveRecords(arr);toast('기록됨: '+lastWord+' / '+level)}
+function addRecordFromForm(){const arr=records();arr.unshift({time:nowString(),date:$('date').value||today(),situation:$('situation').value,word:$('targetWord').value,prompt:$('prompt').value,note:$('note').value.trim()});$('note').value='';saveRecords(arr);toast('기록을 추가했습니다')}
+function renderLogs(){const arr=records();$('logBody').innerHTML=arr.length?arr.map(r=>`<tr><td>${r.time}</td><td>${r.situation}</td><td><b>${r.word}</b></td><td>${r.prompt}</td><td>${r.note||''}</td></tr>`).join(''):`<tr><td colspan="5">아직 기록이 없습니다.</td></tr>`;renderSummary()}
+function renderSummary(){const arr=records();const total=arr.length, ind=arr.filter(r=>r.prompt==='독립').length, problem=arr.filter(r=>r.prompt==='문제행동').length;const used=new Set(arr.map(r=>r.word)).size;const rate=total?Math.round(ind/total*100):0;$('summaryCards').innerHTML=`<div class="summary"><b>${total}</b><span>총 기록</span></div><div class="summary"><b>${used}</b><span>사용 단어</span></div><div class="summary"><b>${rate}%</b><span>독립률</span></div><div class="summary"><b>${problem}</b><span>문제행동</span></div>`}
+function exportCSV(){const arr=records();if(!arr.length){toast('내려받을 기록이 없습니다');return}const header=['time','date','situation','word','prompt','note'];const rows=[header.join(',')].concat(arr.map(r=>header.map(k=>'"'+String(r[k]||'').replaceAll('"','""')+'"').join(',')));const blob=new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='speaking_program_records.csv';a.click();URL.revokeObjectURL(a.href)}
+function clearRecords(){if(confirm('기록을 모두 삭제할까요?')){localStorage.removeItem('speakProgramRecords');renderLogs();toast('삭제했습니다')}}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
+function initSelects(){ $('date').value=today(); $('targetWord').innerHTML=allWords.map(w=>`<option>${w}</option>`).join('') }
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');if(btn.dataset.tab==='data')renderLogs()}));
+initSelects();renderStages();renderLogs();
+</script>
+</body>
+</html>
